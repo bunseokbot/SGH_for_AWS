@@ -2,16 +2,32 @@
 
 {% block content %}
 
-<!-- 배너 -->
-<div class="container">
-    <div class="txtcontainer">
-        <p class="lgtxt">
-            당신이 졸업을 할 수 있을지 확인하세요
-        </p>
-        <p class="smtxt">
-            PleaseGraduate에서는 단지 uis 아이디와 비밀번호만 입력하면 자동으로 사용자의 성적을 분석하여 모자란 학점, 부족한 영역, 앞으로
-            무슨 과목을 들어야하는지 한눈에 보여줍니다
-        </p>
+<!-- 메인 -->
+<header class="main_bg">
+    <!-- 세종대 로고 -->
+    <div class="sejong_logo"></div>
+    <!-- 소개 문구 -->
+    <div class="bg_text_btn">
+        <div class="bg_small_text fadein_text">
+            세종인을 위한 간편한 졸업요건 검사 사이트
+        </div>
+        <div class="bg_big_text fadein_text">
+            Please Graduate
+        </div>
+        <div class="bg_btn">
+            <button class="bg_btn_style" onclick="location.href='/login/'">검사하기</button>
+        </div>
+    </div>
+</header>
+
+<!-- 웹 권장 모달-->
+<div id='myModal' class="modal" style ="display: none;">
+    <div class="modal-content">
+        <span class="close" style="font-size:5rem;">&times;</span>
+        <div class="modal_div">
+            <br><br><br><br><br>
+            <div style="font-size:3rem; font-weight:bold; padding-bottom:6rem;">사이트 이용시 모바일 환경에서는 화면이 깨질 수 있으므로 PC 환경에서의 사용을 권장합니다.</div>
+        </div>
     </div>
 </div>
 
@@ -22,13 +38,30 @@
 {% block js_section %}
 <!-- js 파트 -->
 <script>
-    const toggleb = document.querySelector('.navbar_toggle');
-    const menu = document.querySelector('.navbar_menu');
+    // 기기 검사
+    var filter = "win16|win32|win64|mac|macintel"; 
+    if ( navigator.platform ) { 
+        // 모바일에서만 보이게함
+        if(filter.indexOf( navigator.platform.toLowerCase() ) < 0 ) { 
+            document.getElementById('myModal').style.display="block";
+        } 
+    }
 
-    toggleb.addEventListener('click', () => {
-        menu
-            .classList
-            .toggle('active');
-    });
+    // 모달 창
+    var Spanclick = function (x, y) {
+        x.onclick = function () {
+            y.style.display = "none";
+        }
+    }
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    var modal = document.getElementById('myModal');
+    var span = document.getElementsByClassName("close")[0];
+
+    Spanclick(span, modal);
 </script>
 {% endblock %}

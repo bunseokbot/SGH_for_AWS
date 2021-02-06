@@ -3,12 +3,17 @@
 
 <head>
     <meta charset="UTF-8">
+    <!--
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    -->
+    <meta name="viewport" content="width=1280">
+    
     <!-- static 폴더 참조 -->
     <!-- 원그래프 js는 각 페이지에서 소환해야됨 (일회성 호출이라서.) -->
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- favicon -->
+    <link rel="icon" href="{% static 'img/favicon.ico' %}">
 
     <!-- 웹 참조-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
@@ -31,124 +36,88 @@
     <nav class="navbar">
         <div class="navbar_logo">
             {% load static %}
-            <a href="/head/"><img src="{% static 'img/logo.png' %}"></a>
+            <a href="javascript:back_confirm()"><img src="{% static 'img/logo.png' %}"></a>
         </div>
-
+        
         <ul class="navbar_menu">
             <li>
-                <a href="/head/">Home</a>
+                <a href='javascript:go_feedback()'>피드백하기</a>
             </li>
             <li>
                 <!-- 로그인 세션 활용 -->
                 {% if not request.session.id  %}
-                <a id="loginBtn">Login</a>
+                <a href='/login/'>로그인</a>
                 {% else %}
-                <a href='/f_logout/'>Logout</a>
+                <a href='javascript:back_confirm()'>로그아웃</a>
                 {% endif %}
             </li>
         </ul>
-
         <a href="#" class="navbar_toggle">
             <i class="fas fa-bars"></i>
         </a>
     </nav>
 
+
     {% block content %}
     {% endblock %}
 
-    <!--푸터-->
+
+    <!--footer-->
     <footer class="footer">
         <ul class="footer_list">
             <li>
-                Contact Us : 000-0000-0000
+                - Contact -
             </li>
             <li>
-                Email : AAAAA@gmail.com
+                Email : hanjo8813@gmail.com
             </li>
             <li>
-                Adress : 서울시 광진구 능동로
+                GitHub : https://github.com/hanjo8813/SGH_for_AWS
             </li>
         </ul>
-        <ul class="footer_list">
-            <li>
-                이용약관
-            </li>
-            <li>
-                개인정보처리방침
-            </li>
-        </ul>
-        <h2 class="copyright">copyright
+        <h2 class="copyright">Copyright
             <i class="far fa-copyright"></i>
             2021 PleaseGraduate team <br>
             강전호, 강홍구, 권정현, 안재현, 한재원
         </h2>
     </footer>
-
-    <!--로그인 모달-->
-    <div id="loginModal" class="modal loginmodal">
-
-        <div class="modal-content login-content">
-            <p>
-                <span class="logincap">
-                    <i class="fas fa-graduation-cap"></i>
-                    <span class="close loginclose">&times;</span>
-                </span>
-            <div class="welcome">
-                PleaseGraduate에 오신 것을 환영합니다
-            </div>
-
-            <!-- 로그인 폼 -->
-            <div class="loginform">
-                <form action="/loading/" method="post">
-                    {% csrf_token %}
-                    <div class="textbox">
-                        <input type="text" name="id" placeholder="Uis 아이디">
-                        <input type="password" name="pw" placeholder="Uis 비밀번호">
-                    </div>
-                    <input type="submit" class="login" onclick='exception()' value="로그인">
-                </form>
-            </div>
-
-            <div class="explain">계속 진행하면 PleaseGraduate의
-                <div class="inexplain">서비스 약관, 개인정보 보호정책</div>에 동의한 것으로 간주됩니다.
-            </div>
-
-            <div class="caution">#주의사항#
-            </div>
-            <div>PleaseGraduate는 웹 chrome브라우저 환경에서만 가능합니다</div>
-            <div>Uis와 대양센터의 아이디, 비밀번호가 전부 일치해야합니다</div>
-            </p>
-        </div>
-    </div>
-
 </body>
+
+
+
 
 {% block js_section %}
 {% endblock %}
 
+<!-- 예외처리 -->
+{% if messages %}
+    {% for m in messages %}
+    <script>
+        alert('{{ m }}') ;
+    </script>
+    {% endfor %}
+{% endif %}
+
 <script>
-    var loginmodal = document.getElementById('loginModal');
-    var loginbtn = document.getElementById("loginBtn");
-    var span = document.getElementsByClassName("loginclose")[0];
-
-    var loginException = true;  //로그인 예외처리 변수
-
-    loginbtn.onclick = function () {
-        loginmodal.style.display = "block";
-    }
-
-    span.onclick = function () {
-        loginmodal.style.display = "none";
-    }
-
-    //로그인 예외처리 경고창
-    function exception() {
-        if (loginException == true) {
-            window.location.href = "loading.html";
+    // 로고 클릭시
+    function back_confirm(){
+        // 세션없을때
+        if('{{request.session.id}}' == ''){
+            location.href = '/f_logout/';
         }
-        else {
-            alert("Uis 아이디와 비밀번호가 틀렸습니다. 다시 확인하세요.")
+        // 세션 있을때
+        else{
+            var back_head = confirm('⚠️ 확인을 누르면 로그아웃 됩니다. ⚠️');
+            if(back_head){
+                window.onbeforeunload = null;
+                window.location.href = '/';
+            }
         }
+    };
+    // 피드백 클릭시
+    function go_feedback(){
+        window.onbeforeunload = null;
+        window.open('https://forms.gle/f2vUqVg9wQFneBLf7', '_blank'); 
     }
 </script>
 
