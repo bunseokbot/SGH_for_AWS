@@ -1021,7 +1021,7 @@ def f_login(request):
 
 # result 페이지 테스트용.
 def result_test(request):
-    user_id = '15011133'
+    user_id = '15011187'
 
     # userinfo 테이블에서 행 추출
     u_row = UserInfo.objects.get(student_id = user_id)
@@ -1073,11 +1073,11 @@ def result_test(request):
     
     # 2. 중필(교필) 필수과목. { 학수번호 : 그룹번호 } 딕셔너리로 매핑
     # ind로 필수과목 추출후 딕셔너리 만들기
-    dic_ce = make_dic([s_num for s_num in s_row.ce_list.split(',')])
+    dic_ce = make_dic([s_num for s_num in s_row.ce_list.split('/')])
     # 3. 중선(교선1) 필수과목
-    dic_cs = make_dic([s_num for s_num in s_row.cs_list.split(',')])
+    dic_cs = make_dic([s_num for s_num in s_row.cs_list.split('/')])
     # 4. 기교 필수과목 
-    dic_b = make_dic([s_num for s_num in s_row.b_list.split(',')]) 
+    dic_b = make_dic([s_num for s_num in s_row.b_list.split('/')]) 
 
     #------------------------------------------------------------------------------
     # user_grade 테이블에서 사용자의 성적표를 DF로 변환하기
