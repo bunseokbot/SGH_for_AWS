@@ -55,6 +55,7 @@ def make_dic(my_list):
     dic = defaultdict(lambda:-1)
     for s_num in my_list:
         dic[s_num]
+        # 필수과목의 동일과목은 sg 테이블에서 1:1로만 담겨잇어야함.
         sg = SubjectGroup.objects.filter(subject_num = s_num)
         if sg.exists():
             dic[s_num] = sg[0].group_num
@@ -73,12 +74,15 @@ def make_recommend_list(my_dic, dic):
         if s_num in dic_.keys():
             check[s_num] = 1
             dic_.pop(s_num)
-        # 없다면? 2차 검사
+        # 없다면? 2차 검사 (사용자가 새 과목으로 재수강했을 경우)
         else :
+            # 내 과목 리스트에서 그룹번호를 꺼냄
             g_num = my_dic_[s_num]
+            # 기준 과목 리스트에서 그룹번호가 같은게 있으면 학수를 동일과목으로 바꿈
             for k, v in dic_.items():
                 if v == g_num :
                     s_num = k
+            # 해당 그룹번호가 기준에도 있다면 
             if g_num != -1 and (g_num in dic_.values()):
                 check[s_num] = 1
                 dic_.pop(s_num)
