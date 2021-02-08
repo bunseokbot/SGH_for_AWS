@@ -48,9 +48,9 @@ a {
     cursor: pointer;
 }
 
-.navbar_menu li:hover {
-    background-color: blanchedalmond;
-    border-radius: 6px;
+.navbar_menu li a:hover {
+    font-weight: bold;
+    color : rgb(164, 26, 55);
 }
 
 .navbar_toggle {
