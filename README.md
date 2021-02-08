@@ -2,6 +2,8 @@
 
 ### 세종대학교 졸업요건 검사 사이트 'Sejong Please Graduate'
 
+<br>
+
 <table >
     <tr>
         <td width="600" align='center'>사이트 링크 <br> http://sejong-please-graduate.ml/</td>
