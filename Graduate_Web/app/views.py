@@ -637,13 +637,12 @@ def f_login(request):
         html = driver.page_source  # 페이지 소스 가져오기 , -> 고전독서 인증현황 페이지 html 가져오는것
         # 독서 권수 리스트에 저장
         soup = BeautifulSoup(html, 'html.parser')
-         # 유저 학과 저장
+        # 유저 학과 저장
         soup_major = soup.select_one("li > dl > dd")
-        major = soup_major.string.strip().strip()
-        for dd in soup_major:
-            if dd.string.strip() == '' :  # 공백제거 및 필요없는 문자 지우기
-                continue
-            major = dd.string.strip().replace('학과', '')
+        major = soup_major.string[:-2]
+        # 지능기전공학부의 경우 
+        if major == '무인이동체공학' or major == '스마트기기공학':
+            major = '지능기전공'      
         # 유저 이름 저장
         soup_name = soup.select("li > dl > dd")
         name = soup_name[2].string
@@ -822,11 +821,10 @@ def f_login(request):
             soup = BeautifulSoup(html, 'html.parser')
              # 유저 학과 저장
             soup_major = soup.select_one("li > dl > dd")
-            major = soup_major.string.strip().strip()
-            for dd in soup_major:
-                if dd.string.strip() == '' :  # 공백제거 및 필요없는 문자 지우기
-                    continue
-                major = dd.string.strip().replace('학과', '')
+            major = soup_major.string[:-2]
+            # 지능기전공학부의 경우 
+            if major == '무인이동체공학' or major == '스마트기기공학':
+                major = '지능기전공' 
             # 유저 이름 저장
             soup_name = soup.select("li > dl > dd")
             name = soup_name[2].string
@@ -977,10 +975,15 @@ def f_login(request):
                 new_ug.save()
         # 어디든 오류 발생시
         except: 
+            # 드라이버랑 가상디스플레이 안꺼졌으면 끄기
             if 'driver' in locals():
                 driver.quit()
             if 'display' in locals():
                 display.stop()
+            # 엑셀 파일은 삭제
+            file_path = '/srv/SGH_for_AWS/Graduate_Web/app/uploaded_media/'
+            for f in os.listdir(file_path):
+                os.remove(file_path + f)
             messages.error(request, '예기치 못한 오류가 발생했습니다.')
             return redirect('/')
     return r_result(request)
