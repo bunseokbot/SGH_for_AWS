@@ -16,6 +16,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from pyvirtualdisplay import Display
+from django_pandas.io import read_frame
 # 장고 관련 참조
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
@@ -232,10 +233,9 @@ def r_result(request):
 
     #------------------------------------------------------------------------------
     # user_grade 테이블에서 사용자의 성적표를 DF로 변환하기
-    data = pd.DataFrame(columns=['학수번호', '이수구분', '선택영역', '학점'])
-    ug = UserGrade.objects.filter(student_id = user_id)
-    for u in ug:
-        data.loc[len(data)] = [u.subject_num, u.classification, u.selection, u.grade]
+    user_qs = UserGrade.objects.filter(student_id = user_id)
+    data = read_frame(user_qs, fieldnames=['subject_num', 'subject_name', 'classification', 'selection', 'grade'])
+    data.rename(columns = {'subject_num' : '학수번호', 'subject_name' : '교과목명', 'classification' : '이수구분', 'selection' : '선택영역', 'grade' : '학점'}, inplace = True)
 
     # 이수 구분마다 df 생성
     # 전필
@@ -403,8 +403,8 @@ def r_result(request):
 # --------------------------------------------- (공학인증 파트) ----------------------------------------------------------------
 
 def r_en_result(request):
-    #user_id = '16011174'
-    user_id = request.session.get('id')
+    user_id = '16011140'
+    # user_id = request.session.get('id')
 
     # userinfo 테이블에서 행 추출
     u_row = UserInfo.objects.get(student_id = user_id)
@@ -419,32 +419,31 @@ def r_en_result(request):
 
     # df 생성
     # user_grade 테이블에서 사용자의 성적표를 DF로 변환하기
-    data = pd.DataFrame(columns=['년도', '학기', '학수번호', '학점'])
-    ug = UserGrade.objects.filter(student_id = user_id)
-    for u in ug:
-        data.loc[len(data)] = [u.year, u.semester, u.subject_num, u.grade]
+    user_qs = UserGrade.objects.filter(student_id = user_id)
+    data = read_frame(user_qs, fieldnames=['year', 'semester', 'subject_num', 'grade'])
+    data.rename(columns = {'year' : '년도', 'semester' : '학기', 'subject_num' : '학수번호', 'grade' : '학점'}, inplace = True)
 
     # 사용자가 들은 과목리스트 전부를 딕셔너리로.
     my_engine_admit = make_dic(data['학수번호'].tolist())
 
     # 1.전문 교양
-    dic_pro = make_dic([s_num for s_num in s_row.pro_acc_list.split(',')])
+    dic_pro = make_dic([s_num for s_num in s_row.pro_acc_list.split('/')])
     recom_pro, check_pro = make_recommend_list(my_engine_admit, dic_pro)
     mynum_pro = data[data['학수번호'].isin(dic_pro.keys())]['학점'].sum()
 
     # 2. bsm 필수
-    dic_bsm_ess = make_dic([s_num for s_num in s_row.bsm_ess_list.split(',')])
+    dic_bsm_ess = make_dic([s_num for s_num in s_row.bsm_ess_list.split('/')])
     recom_bsm_ess, check_bsm_ess = make_recommend_list(my_engine_admit, dic_bsm_ess)
     mynum_bsm_ess = data[data['학수번호'].isin(dic_bsm_ess.keys())]['학점'].sum()
 
     # 3. bsm 선택 (16학번일때만 해당)
     if s_row.bsm_sel_list:
-        dic_bsm_sel = make_dic([s_num for s_num in s_row.bsm_sel_list.split(',')])
+        dic_bsm_sel = make_dic([s_num for s_num in s_row.bsm_sel_list.split('/')])
         mynum_bsm_ess += data[data['학수번호'].isin(dic_bsm_sel.keys())]['학점'].sum()  # bsm 선택 이수학점을 더한다.
 
     # 4. 전공 설계
     # 4-1. 전공 전체 학점
-    dic_build = make_dic([s_num for s_num in s_row.engine_major_list.split(',')])
+    dic_build = make_dic([s_num for s_num in s_row.engine_major_list.split('/')])
     recom_build, check_build =make_recommend_list(my_engine_admit,dic_build)
     mynum_build = data[data['학수번호'].isin(dic_build.keys())]['학점'].sum()
  
@@ -487,11 +486,11 @@ def r_en_result(request):
     my_engine_admit2 = make_dic(data2['학수번호'].tolist())
 
     # 4-2. 설계 필수과목 안들은 리스트
-    dic_build_ess = make_dic([s_num for s_num in s_row.build_ess_list.split(',')])
+    dic_build_ess = make_dic([s_num for s_num in s_row.build_ess_list.split('/')])
     recom_build_ess, check_build_ess = make_recommend_list(my_engine_admit2, dic_build_ess)
 
     # 4-3. 설계 선택과목 중 안들은 리스트
-    dic_build_sel = make_dic([s_num for s_num in s_row.build_sel_list.split(',')])
+    dic_build_sel = make_dic([s_num for s_num in s_row.build_sel_list.split('/')])
     recom_build_sel, check_build_sel = make_recommend_list(my_engine_admit2, dic_build_sel)
 
 
@@ -1021,7 +1020,7 @@ def f_login(request):
 
 # result 페이지 테스트용.
 def result_test(request):
-    user_id = '15011187'
+    user_id = '16011140'
 
     # userinfo 테이블에서 행 추출
     u_row = UserInfo.objects.get(student_id = user_id)
@@ -1081,10 +1080,9 @@ def result_test(request):
 
     #------------------------------------------------------------------------------
     # user_grade 테이블에서 사용자의 성적표를 DF로 변환하기
-    data = pd.DataFrame(columns=['학수번호', '이수구분', '선택영역', '학점'])
-    ug = UserGrade.objects.filter(student_id = user_id)
-    for u in ug:
-        data.loc[len(data)] = [u.subject_num, u.classification, u.selection, u.grade]
+    user_qs = UserGrade.objects.filter(student_id = user_id)
+    data = read_frame(user_qs, fieldnames=['subject_num', 'subject_name', 'classification', 'selection', 'grade'])
+    data.rename(columns = {'subject_num' : '학수번호', 'subject_name' : '교과목명', 'classification' : '이수구분', 'selection' : '선택영역', 'grade' : '학점'}, inplace = True)
 
     # 이수 구분마다 df 생성
     # 전필
@@ -1253,6 +1251,9 @@ def result_test(request):
 #  -------------------------------------------- (테스트 페이지 렌더링) ---------------------------------------------------------
 
 def r_admin_test(request):
+    # 로컬에서만 접근 가능하도록 하기
+    if platform.system() != 'Windows':
+        return HttpResponse('업데이트는 로컬에서만!')
     return render(request, "admin_test.html")
 
 #  -------------------------------------------- (DB 감지 테스트) ---------------------------------------------------------
@@ -1265,12 +1266,110 @@ def r_dbcheck(request):
 
 #  -------------------------------------------- (강의정보 테이블 업데이트) ---------------------------------------------------------
 
+def make_merge_df():
+    # 사용법
+    # 1. upadate_lecture 폴더안에 1학기 폴더(1st_semester)와 2학기 폴더(2nd_semester) 구분되어 있음
+    # 2. 두 학기의 최신 강의목록 엑셀 파일을 각 폴더에 넣는다.
+    # 3. 각 폴더에는 엑셀파일이 하나씩만 존재해야한다.
+    # 4. 엑셀의 확장자는 .xlsx 가 아닌 .xls 이어야하므로 로컬에서 변경해준다.
+    # 5. 엑셀파일에서 칼럼명이 살짝 이상할때가 있으므로 (한칸띄우기 등등) 검토가 필요함.
+    # 6. DB 변경하는 시간이 1분정도 걸림
+
+    need_col = ['학수번호', '교과목명', '이수구분', '선택영역', '학점']
+    # 1학기 엑셀 불러오기
+    file_path = './app/update_lecture/1st_semester/'
+    file_name = os.listdir(file_path)[0]
+    df_sem_1 = pd.read_excel(file_path + file_name, index_col=None)                             # 해당 엑셀을 DF화 시킴
+    df_sem_1.drop([d for d in list(df_sem_1) if d not in need_col]  , axis=1, inplace=True)     # 필요한 컬럼만 추출
+    # 2학기 엑셀 불러오기
+    file_path = './app/update_lecture/2nd_semester/'
+    file_name = os.listdir(file_path)[0]
+    df_sem_2 = pd.read_excel(file_path + file_name, index_col=None)                             # 해당 엑셀을 DF화 시킴
+    df_sem_2.drop([d for d in list(df_sem_2) if d not in need_col]  , axis=1, inplace=True)     # 필요한 컬럼만 추출
+
+    # 두 df를 병합, 중복제거
+    df_merge = pd.concat([df_sem_1, df_sem_2])
+    df_merge.drop_duplicates(['학수번호'], inplace=True, ignore_index=True)
+    s_num_list = df_merge['학수번호'].tolist()  # 최신강의 학수번호 리스트
+    return df_merge, s_num_list
+
+
+def f_test_update(request):
+    df_merge, s_num_list = make_merge_df()
+
+    # 1. test_new_lecture 업데이트
+    # 우선 text_new_lecture 테이블의 데이터를 모두 삭제해준다
+    TestNewLecture.objects.all().delete()
+    time.sleep(5)   # 삭제하는 시간 기다리기
+
+    # 테이블에 최신 학수번호를 삽입
+    for s_num in s_num_list:
+        new_nl = TestNewLecture()
+        new_nl.subject_num = s_num
+        new_nl.save()
+
+    # 2. test_all_lecture 업데이트
+    # test_all_lecture 쿼리셋을 df로 변환
+    df_al = read_frame(TestAllLecture.objects.all())
+    # df 칼럼명 바꾸기
+    df_al.rename(columns = {'subject_num' : '학수번호', 'subject_name' : '교과목명', 'classification' : '이수구분', 'selection' : '선택영역', 'grade' : '학점'}, inplace = True)
+
+    # 기존 테이블 df에서 학수번호 겹치는 것을 삭제
+    for i, row in df_al.iterrows():
+        if int(row['학수번호']) in s_num_list:
+            df_al.drop(i, inplace=True)
+    # 삭제한 df에 최신 강의 df를 병합
+    df_new_al = pd.concat([df_al, df_merge])
+    # test_all_lecture 테이블 안 데이터 모두 삭제
+    TestAllLecture.objects.all().delete()
+    time.sleep(5)
+
+    # 삭제 후에 최신 강의 DF를 한 행씩 테이블에 추가
+    for i, row in df_new_al.iterrows():
+        new_al = TestAllLecture()
+        new_al.subject_num = row['학수번호']
+        new_al.subject_name = row['교과목명']
+        new_al.classification = row['이수구분']
+        new_al.selection = row['선택영역']
+        new_al.grade = row['학점']
+        new_al.save()
+
+    return HttpResponse('업데이트 완료, MySQL test_all_lecture / test_new_lecture 테이블 확인')
+
 def f_update(request):
+    df_merge, s_num_list = make_merge_df()
+
+    # 1. new_lecture 업데이트
+    NewLecture.objects.all().delete()
+    time.sleep(5)  
+    for s_num in s_num_list:
+        new_nl = NewLecture()
+        new_nl.subject_num = s_num
+        new_nl.save()
+
+    # 2. all_lecture 업데이트
+    df_al = read_frame(AllLecture.objects.all())
+    df_al.rename(columns = {'subject_num' : '학수번호', 'subject_name' : '교과목명', 'classification' : '이수구분', 'selection' : '선택영역', 'grade' : '학점'}, inplace = True)
+    for i, row in df_al.iterrows():
+        if int(row['학수번호']) in s_num_list:
+            df_al.drop(i, inplace=True)
+    df_new_al = pd.concat([df_al, df_merge])
+    AllLecture.objects.all().delete()
+    time.sleep(5)
+    for i, row in df_new_al.iterrows():
+        new_al = AllLecture()
+        new_al.subject_num = row['학수번호']
+        new_al.subject_name = row['교과목명']
+        new_al.classification = row['이수구분']
+        new_al.selection = row['선택영역']
+        new_al.grade = row['학점']
+        new_al.save()
+ 
     return HttpResponse('업데이트 완료, MySQL all_lecture / new_lecture 테이블 확인')
+
 
 #  -------------------------------------------- (터미널 테스트) ---------------------------------------------------------
 
 def f_test(request):
-   
     return HttpResponse('테스트 완료, 터미널 확인')
 

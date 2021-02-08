@@ -25,7 +25,13 @@ ROOT_DIR = os.path.dirname(BASE_DIR)
 SECRET_KEY = '$9!ib@j_wk2%a@5%^a!vjbslh10fh_p@z2)wk5p+ff5(+a2lf^'
 
 # 개발시엔 True로 디버그 확인, 배포시엔 False
-DEBUG = True
+DEBUG = True    # 우선 사용자 피드백을 위해 켜두자
+'''
+if platform.system() == 'Windows':
+    DEBUG = True
+else:
+    DEBUG = False
+'''
 
 
 # 호스트 설정

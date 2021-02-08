@@ -2,37 +2,40 @@ from django.db import models
 
 # DB 테이블의 구조를 파이썬 클래스로 보여주고, 수정가능
 
-class UserGrade(models.Model):
-    student_id = models.CharField(max_length=10)
-    year = models.CharField(max_length=10)
-    semester = models.CharField(max_length=45)
-    subject_num = models.CharField(max_length=10)
+# 테스트용 테이블
+
+class TestTable(models.Model):
+    num = models.IntegerField(primary_key=True)
+    text = models.CharField(max_length=45)
+
+    class Meta:
+        managed = False
+        db_table = 'test_table'
+        
+
+class TestAllLecture(models.Model):
+    subject_num = models.CharField(primary_key=True, max_length=10)
     subject_name = models.CharField(max_length=70)
     classification = models.CharField(max_length=45)
     selection = models.CharField(max_length=45, blank=True, null=True)
     grade = models.IntegerField()
-    index = models.AutoField(primary_key=True)
 
     class Meta:
         managed = False
-        db_table = 'user_grade'
+        db_table = 'test_all_lecture'
 
 
-class UserInfo(models.Model):
-    student_id = models.CharField(primary_key=True, max_length=10)
-    year = models.IntegerField()
-    major = models.CharField(max_length=45)
-    name = models.CharField(max_length=45)
-    book = models.CharField(max_length=45)
-    eng = models.IntegerField()
+class TestNewLecture(models.Model):
+    subject_num = models.CharField(primary_key=True, max_length=10)
 
     class Meta:
         managed = False
-        db_table = 'user_info'
+        db_table = 'test_new_lecture'
 
+# ---------------------------------------------------------------------------
 
 class AllLecture(models.Model):
-    subject_num = models.CharField(primary_key=True, max_length=10)   
+    subject_num = models.CharField(primary_key=True, max_length=10)
     subject_name = models.CharField(max_length=70)
     classification = models.CharField(max_length=45)
     selection = models.CharField(max_length=45, blank=True, null=True)
@@ -64,15 +67,15 @@ class Standard(models.Model):
     cs_list = models.CharField(max_length=100)
     b_list = models.CharField(max_length=100)
     sum_eng = models.IntegerField()
-    pro = models.IntegerField()
-    bsm = models.IntegerField()
-    build = models.IntegerField()
-    pro_acc_list = models.CharField(max_length=100)
-    bsm_ess_list = models.CharField(max_length=100)
+    pro = models.IntegerField(blank=True, null=True)
+    bsm = models.IntegerField(blank=True, null=True)
+    build = models.IntegerField(blank=True, null=True)
+    pro_acc_list = models.CharField(max_length=100, blank=True, null=True)
+    bsm_ess_list = models.CharField(max_length=100, blank=True, null=True)
     bsm_sel_list = models.CharField(max_length=100, blank=True, null=True)
-    build_ess_list = models.CharField(max_length=100)
-    build_sel_list = models.CharField(max_length=100)
-    engine_major_list = models.CharField(max_length=200)
+    build_ess_list = models.CharField(max_length=100, blank=True, null=True)
+    build_sel_list = models.CharField(max_length=100, blank=True, null=True)
+    engine_major_list = models.CharField(max_length=200, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -89,10 +92,30 @@ class SubjectGroup(models.Model):
         db_table = 'subject_group'
 
 
-class TestTable(models.Model):
-    num = models.IntegerField(primary_key=True)
-    text = models.CharField(max_length=45)
+class UserGrade(models.Model):
+    student_id = models.CharField(max_length=10)
+    year = models.CharField(max_length=10)
+    semester = models.CharField(max_length=45)
+    subject_num = models.CharField(max_length=10)
+    subject_name = models.CharField(max_length=70)
+    classification = models.CharField(max_length=45)
+    selection = models.CharField(max_length=45, blank=True, null=True)
+    grade = models.IntegerField()
+    index = models.AutoField(primary_key=True)
 
     class Meta:
         managed = False
-        db_table = 'test_table'
+        db_table = 'user_grade'
+
+
+class UserInfo(models.Model):
+    student_id = models.CharField(primary_key=True, max_length=10)
+    year = models.IntegerField()
+    major = models.CharField(max_length=45)
+    name = models.CharField(max_length=45)
+    book = models.CharField(max_length=45)
+    eng = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'user_info'

@@ -40,6 +40,19 @@
 - 엑셀 파일 다운 -> DF화 -> DB에 저장 -> 엑셀 삭제 방식으로 변경
 
 
+## 설치한 라이브러리 목록
+
+- `pip install django`
+- `pip install mysqlclient`
+- `pip install pandas`
+- `pip install xlrd`
+- `pip install selenium`
+- `pip install beutifulsoup4`
+- `pip install surprise`
+- `pip install django-pandas`
+- `pip install pylint-django` (vs코드용)
+
+
 ## 참고 사이트 
 
 - [AWS mysql 설치](https://ndb796.tistory.com/314)
