@@ -28,7 +28,13 @@ from .models import *
 
 def r_head(request):
     request.session.clear()
-    return render(request, "head.html")
+    context = {
+        # 세션 테이블의 행의 개수 (방문자 수)를 센다
+        'visit_num' : DjangoSession.objects.count(),
+        # success_test_count 테이블의 검사횟수 누적값을 가져옴
+        'test_num' : SuccessTestCount.objects.get(index=0).num_count,   
+    }
+    return render(request, "head.html", context)
 
 def r_login(request):
     return render(request, "login.html")
@@ -986,6 +992,12 @@ def f_login(request):
                 os.remove(file_path + f)
             messages.error(request, '예기치 못한 오류가 발생했습니다.')
             return redirect('/')
+
+    # 여기까지 성공적으로 오면 총 검사수 +1 증가
+    stc = SuccessTestCount.objects.get(index=0)
+    stc.num_count += 1
+    stc.save()
+
     return r_result(request)
         
      

@@ -34,6 +34,25 @@ class TestNewLecture(models.Model):
 
 # ---------------------------------------------------------------------------
 
+class DjangoSession(models.Model):
+    session_key = models.CharField(primary_key=True, max_length=40)
+    session_data = models.TextField()
+    expire_date = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'django_session'
+
+
+class SuccessTestCount(models.Model):
+    index = models.IntegerField(primary_key=True)
+    num_count = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'success_test_count'
+
+
 class AllLecture(models.Model):
     subject_num = models.CharField(primary_key=True, max_length=10)
     subject_name = models.CharField(max_length=70)
