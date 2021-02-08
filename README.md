@@ -1,6 +1,7 @@
 # < Sejong Graduate Helper >
 
 ### 세종대학교 졸업요건 검사 사이트 'Sejong Please Graduate'
+> #### version : 1.0
 
 <br>
 
