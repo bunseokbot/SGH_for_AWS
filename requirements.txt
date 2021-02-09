@@ -1,0 +1,8 @@
+django==3.1
+mysqlclient
+pandas
+xlrd
+selenium
+beautifulsoup4
+surprise
+django-pandas
