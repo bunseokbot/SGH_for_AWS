@@ -1305,7 +1305,10 @@ def make_merge_df():
     # 두 df를 병합, 중복제거
     df_merge = pd.concat([df_sem_1, df_sem_2])
     df_merge.drop_duplicates(['학수번호'], inplace=True, ignore_index=True)
-    s_num_list = df_merge['학수번호'].tolist()  # 최신강의 학수번호 리스트
+    # 선택영역 Nan을 바꾸기
+    df_merge.fillna('', inplace = True)
+    # 최신강의 학수번호 리스트
+    s_num_list = df_merge['학수번호'].tolist()  
     return df_merge, s_num_list
 
 
