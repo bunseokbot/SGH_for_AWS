@@ -33,7 +33,6 @@ else:
     DEBUG = False
 
 
-
 # 호스트 설정
 ALLOWED_HOSTS = [
     # 개발용 호스트(모두 허용)

@@ -757,6 +757,7 @@ def f_login(request):
         shutil.move(file_name,os.path.join(file_path,new_file_name))
         time.sleep(1)
         df = pd.read_excel(file_path + new_file_name, index_col=None) # 해당 엑셀을 DF화 시킴
+        df.fillna('', inplace = True)
         os.remove(file_path + new_file_name)    # 해당 엑셀파일 삭제
         # 논패, F과목 삭제
         n = df.shape[0]
@@ -950,6 +951,7 @@ def f_login(request):
             shutil.move(file_name,os.path.join(file_path,new_file_name))
             time.sleep(1)
             df = pd.read_excel(file_path + new_file_name, index_col=None) # 해당 엑셀을 DF화 시킴
+            df.fillna('', inplace = True)
             os.remove(file_path + new_file_name)    # 해당 엑셀파일 삭제
             # 논패, F과목 삭제
             n = df.shape[0]
